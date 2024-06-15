@@ -1,0 +1,60 @@
+Git Advance:
+
+Take notes for each topic:
+
+- Cherry Picking:
+
+    its used to pick a commit form a different branch, it will take that and create a new commit
+
+- stash and tags:
+
+    if you wanna stash all the stuf u were working curretnly and then wanna checksome other issue
+    git tag will be used when you wanna match a hight point in yout commit (like a new versdion release)
+    
+    git checkout -b branchname v1.0
+    git stash: Saves all the modified files temporarily
+    git stash list: Lists all the stashed sets
+    git stash apply: Applies the latest stashed content
+    git stash pop: Applies the latest stashed set and drops it
+    git tag: Adds a tag to a commit
+    git tag -a -m: Adds an annotated tag with a message
+    git push tag name: Pushes tag to the remote repo.
+
+- Git submodule:
+
+    if you wanna use someothers work in your repo (it basically creates a git folder in ur git folder)
+
+    git submodule add <url>
+    git submodule update
+
+    git submodule add <URL>: Adds a submodule to the project.
+    git submodule status: View status (working, staging, or indexed files) of all the submodules.
+    git submodule update: Updates submodules after switching branches.
+    git submodule update --init: After cloning a new repo, if you need to add submodules to it from .gitmodules file, use this command.
+    git submodule update --init --recursive: If the submodules inside a newly cloned repo are nested, then use this.
+    git submodule update --remote: Pulls all changes in the submodules    
+
+- Git blame:
+
+    to find out who is the killer
+
+    git blame [options] filename: it will list all the lines and the authoer and the commit hash ( u can find the culprit who pushed that buggy line)
+
+    Options:
+
+    -L to filter based on line numbers
+    -s to suppress the author's name and timestamp from the output
+    -e to show the author's email instead of the author's name
+    -f to show the filename in the original commit
+    -n to show the line number in the original commit
+    Example: To find the author of lines 5 to 7 in the file Readme.md, one can use:
+
+    git blame -L 5,7 Readme.md    
+
+- Git Bisect:
+
+    git bisect log
+    git bisect reset
+    git bisect start
+    git bisect good <commitid>
+    git bisrct bad

@@ -1,0 +1,195 @@
+ANSIBLE:
+
+ansible ad hoc commands:
+
+AD-HOC Keywords:
+
+ansible
+ansible-config
+ansible-vault
+ansible-doc
+ansible-galaxy
+ansible-playbook
+ansible-console
+anisble-pull
+
+ansible: This is a tool that allows you to run a single task at a time.
+$ ansible <host-pattern> [-m module_name] [-a args] [options]
+
+ansible-playbook: This is the tool used to run ansible playbook
+$ ansible-playbook <filename.yml> ... [options]
+
+ansible-console: This is a REPL using which you can run ad-hoc commands on chosen inventories.
+$ ansible-console <host-pattern> [-m module_name] [-a args] [options]
+
+ansible-pull: This inverts the default push architecture of Ansible into a pull architecture, which has near-limitless scaling potential.
+ansible-pull -U URL [options] [ <filename.yml> ]
+
+ansible-doc: Displays data on modules installed in Ansible libraries.
+$ ansible-doc [-M module_path] [-l] [-s] [module...]
+
+ansible-vault: Using this you can encrypt any structured data file used by Ansible.
+$ ansible-vault [create|decrypt|edit|encrypt|rekey] [--help] [options] file_name
+
+ansible-galaxy: This is a shared repository for Ansible roles. This ansible-galaxy command can be utilized to manage these roles, or to create a skeleton framework for the roles to be uploaded to Galaxy.
+$ ansible-galaxy [delete|import|info|init|install|list|login|remove|search|setup] [--help] [options]
+
+Short Hands in Ansible:
+
+	-a: This tells the arguments to pass to the module
+
+	-m: Execute the module
+
+	-b: Use privilege escalation (become)
+
+	-i: The path to the inventory, which defaults to /etc/ansible/hosts
+
+	--version: Show program version number
+
+	--help: Shows help message
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+ansible-doc <module name> it helps in checking the stuff of module
+
+##############################################################
+
+Lesson1:
+	Configuration file:
+		/etc/ansible/ansible.cfg
+		
+	the abv is the deafult, u can have your custom config as well 
+		- copy the config in your repo and make ur change (or)
+		- create an env variable to the path of ur config $ANSIBLE_CONFIG=/path
+		- the env var can be cerated temp or permanent
+		
+	if you wanna change only a line of the config, u can pass it like
+		- ANSIBLE_(the config name) ANSIBLE_GATHERING=explicit
+		
+	view connfiguration:
+		- ansible-config list (all config)
+		- ansible-config view (shows current config file)
+		- ansible-config dump ( current settings)
+	
+	We learnt abt yaml
+	
+Lesson2:
+	Ansible Inventory:
+	 /etc/ansible/hosts 
+	 
+	 its an ini format
+	 can also be wriiten in yaml
+	 	 
+	ansible_host=
+	ansible_port
+	ansible_connection
+	ansible_user
+	ansible_ssh_pass= (for linux)
+	anisble_password= (windows)
+	
+	i did learning of grouping the inventory, children and stuff
+	
+Lesson3:
+	Variables:
+		it can be passed in different methods
+			- in playbook:
+				vars:
+				  name: blah
+				  color: blue
+				it can be used as '{{name}}'
+				if its part of a sentence {{name}} is okay (no quotes)
+			- in the inventory file 
+				eg: all the above ansible_host, user are variable
+				also
+				[all:vars]
+				app_list=['vim','jq']
+				
+			- as a separate variable file
+				key1: pair
+				key2: pair
+			- as a command ( it has the highest precedence)
+			ansible-playbook playbook.yml–-extra-vars “dns_server=10.5.5.6” dns_server=10.5.5.6
+				
+	Types of variable:
+		string -> "name: blah"
+		number -> max_connections: 100
+		boolean -> debug: true
+		list variable -> packages:
+						  - yum
+						  - apt
+		( list variables can be acccessed using indices {{packages[0]}}		
+			if its a part of a loop then simply {{packages}}
+			
+	    dictionary -> user:
+						 name: "admin"
+						 password: "secret"
+		 Accessing it: Username: {{ user.name }}, Password: {{ user.password}}"
+		 
+		 
+	Variables precedence: 
+		u can understand that, more info below doc
+		https://docs.ansible.com/ansible/2.5/user_guide/playbooks_variables.htm
+		
+	Register variables:
+		this guy can store the output of the task under a variable,
+		so that it can be printed out using "debug" "var" module
+		
+		- name: play1
+		  hosts: all
+		  tasks:
+		  - task1:
+				cat /etc/omegalul
+			register: output
+		  - debug:
+			 var:
+				output
+		Note: u can use output.(something) to filter in the output		
+		protip: if u wanna see the output of the command then run thrplaybook in verbose 
+		ansible-playbook –i inventory playbook.yml –v
+		
+	Variable scope:
+		they have scope like host, group ,play,  global
+		u can have a variable assigned to a different host using magic variables
+		
+	magic variables:
+		 {{hostvars[nameofhost].nameofvariable}} also can write in [] as below
+		  msg: ‘{{ hostvars['web2']['ansible_facts']['processor'] }}’
+		 remeber from this,,,too lazy to type
+	
+		'{{groups['america']}}' -> return all the host of the group
+		'{{group_names}}' -> return the groups the host is part of
+		also there is lot others.
+		
+	ansible facts:
+		pc info of the pc its connecting to
+		can be disabled using gather_facts=no , also change in the config file
+		
+Lesson4:
+	Fucking PLAYBOOKS
+	
+- 
+	name: play1
+	hosts: all
+	tasks:
+		- name: install something
+		  yum: 
+	 check the pdf
+	 
+	how to run:
+
+	ansible-playbook (options) (playbookname)
+
+	then he told abt checks
+
+	--check (dry run)
+	--diff ( u know diff)	 
+	--syntax-check (check syntax)
+
+	ansible-playbook configure_nginx.yml--check --diff
+	
+	ANSIBLE_LINT:
+	
+	It checks your code for potential errors, bugs, stylistic errors, and suspicious 
+constructs.
+	"ansible-lint style_example.yml"
+	
+ansible all -m gather_facts --limit hostname | grep ansible_distribution

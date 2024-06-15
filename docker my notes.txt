@@ -1,0 +1,196 @@
+docker run command
+docker image 
+how to build a image using Dockerfile
+FROM
+LABEL
+RUN
+CMD
+EXPOSE
+ENV
+ADD or COPY
+ENTRYPOINT
+VOLUME
+USER
+WORKDIR
+ONBUILD
+
+docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+if u wanna run multiple containers at once then comes the compose file 
+
+version 
+services:
+  service:
+    	image:
+	build:
+	  context: .
+	  dockerfile: 
+   	ports
+	volumes
+	environment
+	depends_on
+
+to run these compose file, the commands are below
+docker compose up/down(most used), but there are lot of options
+
+now its done
+###################################
+
+Now comes orchestration
+
+docker swarm init
+
+docker swarm join then token,
+
+Here comes the concept of service 
+
+docker network create -d overlay
+
+we also discuss abt docker secrets here, where i spent a lot of time spinning up drupaL,  and it was shit not working
+docker service create -d -p (its same as the run command with extra stuffs like --replicas, where services are run on multiple nodes
+
+now lets say u need something like compose for swarm, yepp its called stack
+
+the same as compose file , it can have an extra part called deploy
+    deploy:
+      mode: replicated
+      replicas: 2
+      endpoint_mode: vip
+
+then "docker stack deploy -c compose.ymp stackname"
+
+there are some perks where you can have a base compose file and can have other compose file to overlap on the base compose
+"docker-compose.override.yml"
+
+then we learn abt docker service update --publish-add --publish-rm
+
+i forgot to add before , we learnt about secrets (its with services)
+
+below im just pasting some cmd, dont mind
+#!/bin/bash
+docker network create --driver overlay frontend
+docker network create --driver overlay backend
+docker service create --name vote --network frontend --replicas 2 -p 80:80 -d bretfisher/examplevotingapp_vote
+docker service create --name redis --network frontend --replicas 1 -d redis:3.2
+docker service create --name worker --network frontend --network backend --replicas 1 -d bretfisher/examplevotingapp_worker
+docker service create -d --name db --network backend --replicas 1 --mount type=volume,source=volume,target=/var/lib/postgresql/data  -e POSTGRES_HOST_AUTH_METHOD=trust postgres:9.4
+docker service create --name result --network backend --replicas 1 -p 5001:80 -d bretfisher/examplevotingapp_result
+
+################Kubernetes###################
+
+let me list down the commands
+
+kubectl run name --image=imagename (similar to docker run) it creates a  single pod
+If u wanna pass a cmd during the run comamnd then,
+kubectl run name --image=imagename -- mothofucka
+
+Pod is an abstraction over the container, Pod is basic element
+
+kubectl get pods 
+
+kubectl get all (common resurce in default namespaces)
+
+kubectl create deployment name --image=imagename (this is kinda like service command)
+kubeclt scale --relplicas 2 deployment/deploymentname
+
+the flow is that :  deplyment->replicasets->pods
+
+Now inspecting deployments:
+
+kubeclt get events
+kubecltl get and also 
+kubectl describe
+kubeclt get events --watch-only (it will show only the new events)
+kubectl get all -w ( here w is a watch command, u can add this is other command also)
+you can see the comtainer logs as well, just type in 
+kubeclt logs deployment/name (it will automatiically show up the logs of the firest container in the pod)
+if u wanna select the container ther ':  kubectl logs pods/name -c nameofcontainer
+you can use follow and tail command, kubectl logs pods/name -c nameofcontainer --follow --tail 1
+all container logs in a pod : --all-containers=true
+multiple pod log (use label search) : k logs -l app=myapache
+ 
+##################
+
+Here is the exposing the containers using the services
+the command is expose,
+
+there are 4 types of services
+- clusterip (communication within the cluster obly i.e nodes and pods)
+- NodePort *(its basically localhots)
+- Loadbalacer (here aws ebl can direclt talk to the pods or cotainer i guess)
+- external (add a cname to the coreDNS, its like new exteral domain will mamanger the cluser)
+
+remember here if i create lodabalancer, it auto creates the cluserip and nodeport )it may not be visible
+to us but i creates)
+kubectl expose deployment/name --name (optional) --port 8080 (if u dint mention the --type, default is cluserIP
+else --type NodePort , --type Loadbalacer 
+NodePort Port range: 30000-32767
+
+services FQDN: <hostname>.<namespace>.svc.cluster.local
+
+############## YYYYYYYYAAAAAAAAAAAAMMMMMMMMMMMMLLLLLLLLLLLLLLLLL ###################
+
+Resouce generator
+they are some base templates that fill in all the defau;t values when u run the a resource
+kubectl run name --image=imagename --dry-run=client -o yaml ( it wil show the template)
+
+kubectl api-resources : it is to find the kind for the resources
+
+If threre are multiple api groups for the same resource, then run the below commad and find the latest one
+kubectl api-versions
+
+ Context changes kubectl cluster and namespace 
+• See ~/.kube/config file 
+>kubectl config get-contexts 
+>kubectl config set*
+
+
+################################################
+Usage:  docker image COMMAND
+
+Manage images
+
+Commands:
+  build       Build an image from a Dockerfile
+  history     Show the history of an image
+  import      Import the contents from a tarball to create a filesystem image
+  inspect     Display detailed information on one or more images
+  load        Load an image from a tar archive or STDIN
+  ls          List images
+  prune       Remove unused images
+  pull        Download an image from a registry
+  push        Upload an image to a registry
+  rm          Remove one or more images
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+  #############################################
+  bunch more basic docker command im trying to copy from the word 
+
+
+  docker version
+  docker run:
+    docker run -d-p localport: containerporte MYSQL_RANDOM_ROOT_PASSWORD-yes-network <name of the network>--network-alias <common dns name> -name blabla <image nam
+
+  docker logs:
+    docker container top
+    docker container inspect
+    docker container stats
+
+  docker network:
+    docker network connect
+    docker network disconnect
+
+  fake load balancing:
+    you can give network alias
+    -network-alias list Add network-scoped alias for the container
+    Basically name of the container is its dns name
+    Using alias you can give a same dns name for multiple containers
+    It will provide basic dns round robin load balancing
+
+  Docker image:
+    docker image history
+    docker image inspect
+    docker image
+
+  docker volumes:

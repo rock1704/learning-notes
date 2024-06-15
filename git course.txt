@@ -1,0 +1,100 @@
+Git COURSE:
+
+Commands lesson1:
+
+git config --global user.name "Rokhit"
+git config --global user.email rock@gmail.com
+
+git config user.name
+git config user.email
+
+git init
+git status
+git add .
+git add filename
+git commit -m "meassage" 
+git commit -a -m "meassge" fileame
+
+git log --oneline
+
+git checkout -b "branchname"
+git create branch
+git diff branch1 branch2
+
+
+########################
+git log -p: Prints full details of each commit
+git log --grep-reflog=<pattern>: Shows the list of commits when commit message matches regular expression pattern
+git log --follow ./path/to/filename: Shows the history for the current file
+git show: Outputs content changes of the specified commit
+git diff --color-words: Output has only the color-coded words that have changed
+git diff –staged: Shows the file differences between staging and the last committed version
+git diff .path/to/file: Shows changes in a file compared to the previous commit
+
+################
+
+git remote add origin (path of the remote either local or github)
+git push origin master
+
+git pull is the convenient shortcut key to fetch and merge the content.
+
+git pull <remote_name> <branch_name>
+git fetch command downloads the remote content to your local repo, without changing your code changes.
+
+git fetch <remote_name> <branch_name> fetches the content from that specific branch in remote to your current working area
+git merge command merges the fetched remote content to the local working tree.
+
+git merge <remote_name>/<branch_name> merges the content to the specified branch.
+
+###############################################
+Branch Operations
+You can do the following with branch:
+
+Creating new branch: git checkout -b <branch-name>
+Pushing branch from local to remote repo: git push origin <branch-name>
+Renaming branch:
+Renaming local branch: git branch -m old-name new-name
+Renaming remote branch: git push origin :old-name new-name
+Deleting branch:
+Deleting local branch: git branch -d <branch-name>
+Deleting remote branch: git push origin -d <branch-name>
+
+###############################################
+rebasing
+
+git merge <branch>: Merges <branch> to current branch
+git rebase <base>: Rebases the current branch onto the base (branch name, commit ID, tag)
+git rebase -i <base>: Performs interactive rebase. Launches editor where you can specify command on each commit to transform it.
+git rebase --abort: Cancels rebasing and goes back to the previous commit
+git rebase --continue: Continues rebasing after resolving the rebase conflicts
+git pull --rebase: Fetches the remote copy and rebases it into the current branch of the local copy
+
+###############################################
+
+git revert <commit>: Creates a new commit that undoes all changes made in the commit and applies it to the current branch
+git reset <file>: Moves file changes from staging area to working directory.
+git reset <commit>: Moves current branch's HEAD tip to the old <commit>. All the changes in the commits (that you skipped to move to the old commit) are moved to the working area.
+git commit --amend: Adds staged changes to the last commit and allows for editing the old commit message
+git rm --cached(file_name): Untracks the current file
+git checkout <commit>: Switches the HEAD to the provided commit
+git clean
+git restore --staged filename (or) git reset filename: both thinfs will take the stuff from staged to working area.
+
+#####################
+
+How to restore a deleted file ?
+
+First, find the commit ID where the file was deleted:
+ git rev-list -n 1 HEAD -- filename
+Then checkout to that commit ID to get back the file 
+git checkout deletingcommitid^ -- filename
+
+###############
+
+git clean command undoes files from your repo. However, it stands unique from other undo operations like checkout, reset and revert, as it primarily focuses on untracked files.
+
+git clean is undoable
+Git clean makes hard file deletion possible, similar to the Unix rm command.
+It is good to execute 'git clean -n' command to perform a dry run, which helps to know the list of files to be removed.
+
+use "git restore --staged <file>..." to unstage
